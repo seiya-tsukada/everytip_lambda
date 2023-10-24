@@ -46,36 +46,32 @@ def lambda_handler(event, context):
     pprint.pprint(res["text"])
    
 
-    # Open DM
-    dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
-    pprint.pprint(dm_open_url)
-    method = "GET"
-    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    # body = json.dumps(data).encode("utf-8")
-    request = urllib.request.Request(
-        url=dm_open_url,
-        # data=body,
-        method=method,
-        headers=headers
-    )
-    with urllib.request.urlopen(request) as res:
-        ans = res.read()    
-        ans = ans.json()
-        print("GET OK")
-        pprint.pprint(ans)
+    # # Open DM
+    # dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
+    # pprint.pprint(dm_open_url)
+    # method = "GET"
+    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    # # body = json.dumps(data).encode("utf-8")
+    # request = urllib.request.Request(
+    #     url=dm_open_url,
+    #     # data=body,
+    #     method=method,
+    #     headers=headers
+    # )
+    # with urllib.request.urlopen(request) as res:
+    #     ans = res.read()    
+    #     ans = ans.json()
+    #     print("GET OK")
+    #     pprint.pprint(ans)
 
-    print("get DM channel")
+    # print("get DM channel")
 
-
-
-
-    text = res["text"][0]
 
 
 
     data = {
         "channel" : "fpos",
-        "text" : text,
+        "text" : res["text"][0],
     }
 
 
