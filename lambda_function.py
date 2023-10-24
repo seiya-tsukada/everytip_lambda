@@ -24,22 +24,21 @@ def lambda_handler(event, context):
         res = parse_qs(body)
     else:
         res = "hello everytip"
-   
-    
-    print("res")
-    pprint.pprint(res)
+       
+    # print("res")
+    # pprint.pprint(res)
    
     res_dict = {
-        "api_app_id": res["api_app_id"],
-        "channel_id": res["channel_id"],
-        "channel_name": res["channel_name"],
-        "command": res["command"],
-        "response_url": res["response_url"],
-        "team_domain": res["team_domain"],
-        "token": res["token"],
-        "trigger_id": res["trigger_id"],
-        "user_id": res["user_id"],
-        "user_name": res["user_name"],
+        "api_app_id": res["api_app_id"][0],
+        "channel_id": res["channel_id"][0],
+        "channel_name": res["channel_name"][0],
+        "command": res["command"][0],
+        "response_url": res["response_url"][0],
+        "team_domain": res["team_domain"][0],
+        "token": res["token"][0],
+        "trigger_id": res["trigger_id"][0],
+        "user_id": res["user_id"][0],
+        "user_name": res["user_name"][0],
     }
    
     print("res_dict and res_text")
