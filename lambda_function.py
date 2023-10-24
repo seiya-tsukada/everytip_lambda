@@ -85,8 +85,8 @@ def lambda_handler(event, context):
 
 
     data = {
-        "channel" : "fpos",
-        "text" : res["text"][0],
+        "channel": "fpos",
+        "text": res["text"][0],
     }
 
     # message to the channel
@@ -109,10 +109,10 @@ def lambda_handler(event, context):
    
   
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    res = requests.post(chat_url, headers=headers, data=data)
+    res = requests.post(chat_url, headers=headers, data=json.dumps(data))
 
     print("POST OK")
-    pprint.pprint(res)
+   
 
 
     ###########################
