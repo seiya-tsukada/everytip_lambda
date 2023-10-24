@@ -49,8 +49,10 @@ def lambda_handler(event, context):
         "user_name": res["user_name"][0],
     }
    
-    print("res_dict and res_text")
+    print("res_dict")
     pprint.pprint(res_dict)
+
+    print("res_text")
     pprint.pprint(res["text"])
    
 
@@ -117,7 +119,7 @@ def dynamo_search(data):
     )
 
     print("dynamo_search_part")
-    pprint.pprint(res.Item)
+    pprint.pprint(res["Item"])
 
     return
 
