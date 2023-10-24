@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     res = ""
     body = ""
     res_dict = ""
-
+    text_ret = ""
 
 
 
@@ -52,15 +52,15 @@ def lambda_handler(event, context):
     pprint.pprint(res_dict)
 
     print("res_text")
-    text_validation()
-    pprint.pprint(res["text"])
+    text_ret = text_validation(res["text"])
+    pprint.pprint(text_ret)
 
     #########################
 
 
     # dynamoDB
     print("dynamo part")
-    dynamo_operate(res["user_id"][0])
+    dynamo_operate(res["user_id"][0], )
 
 
 
@@ -97,17 +97,22 @@ def lambda_handler(event, context):
 def text_validation(text):
 
     ret = ""
+    ts = ""
 
+    ts = text.split()
+    pprint.pprint(ts)
+    print(ts[0])
+    print(ts[1])
+    print('isnumeric:', ts[1].isnumeric())
+    print(ts[2])
 
-    ret = text.split()
-    pprint.pprint(ret)
-    print(ret[0])
-    print(ret[1])
-    print('isnumeric:', ret[1].isnumeric())
-    print(ret[2])
-
-
-    return
+    ret = {
+        "mention_name": ts[0],
+        "amount": ts[1],
+        "message": ts[2]
+    }
+    
+    return ret
 
 def dynamo_operate(user_id):
 
