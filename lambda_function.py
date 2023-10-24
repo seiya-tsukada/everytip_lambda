@@ -48,16 +48,16 @@ def lambda_handler(event, context):
    
 
     # Open DM
-    dm_open_url = "https://slack.com/api/conversations.open?token={token}&users={user_id}".format(token=token, user_id=res["user_id"])
+    dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
     pprint.pprint(dm_open_url)
-    method = "GET"
-    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    method = "POST"
+    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
     # body = json.dumps(data).encode("utf-8")
     request = urllib.request.Request(
         url=dm_open_url,
         # data=body,
         method=method,
-        # headers=headers
+        headers=headers
     )
     with urllib.request.urlopen(request) as res:
         ans = res.read()
