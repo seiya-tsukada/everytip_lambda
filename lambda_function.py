@@ -2,10 +2,11 @@ import json
 import base64
 import os
 import pprint
-# import requests
 import urllib.request
 import requests
 from urllib.parse import parse_qs
+
+token = os.environ["SLACK_OAUTH_TOKEN"]
 
 def lambda_handler(event, context):
     # TODO implement
@@ -13,10 +14,10 @@ def lambda_handler(event, context):
     res = ""
     body = ""
     res_dict = ""
-    text = ""
+    
    
-    chat_url = "https://slack.com/api/chat.postMessage"
-    token = env = os.environ["SLACK_OAUTH_TOKEN"]
+    
+    # token = os.environ["SLACK_OAUTH_TOKEN"]
    
 
 
@@ -90,6 +91,8 @@ def lambda_handler(event, context):
     }
 
     # message to the channel
+    post_message_to_the_channel = data
+    
     # method = "POST"
     # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
     # body = json.dumps(data).encode("utf-8")
@@ -107,17 +110,21 @@ def lambda_handler(event, context):
     # print("post NG")
     # pprint.pprint(ans)
    
-  
-    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    res = requests.post(chat_url, headers=headers, data=json.dumps(data))
-
-    print("POST OK")
-   
-
-
     ###########################
 
     return {
         'statusCode': 200,
         'body': res["text"][0]
     }
+
+def post_message_to_the_channel(data):
+
+    ret = ""
+    chat_url = "https://slack.com/api/chat.postMessage"
+    
+    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    ret = requests.post(chat_url, headers=headers, data=json.dumps(data))
+
+    print("POST OK")
+
+    return ret
