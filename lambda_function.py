@@ -63,7 +63,7 @@ def lambda_handler(event, context):
 
     dm_open_res = requests.get(dm_open_url, headers=headers)
     print("get DM channel")
-    pprint.pprint(dm_open_res)
+    pprint.pprint(dm_open_res.content)
 
    
 
@@ -87,13 +87,13 @@ def lambda_handler(event, context):
 def dynamo_operate():
 
     data = {
-        "user_id": "def",
-        "attr1": "attr11",
-        "attr2": "attr22"
+        "user_id": "ghi",
+        "attr1": "attr111",
+        "attr2": "attr222"
     }
     
     dynamo_insert(data)
-    dynamo_search("def")
+    dynamo_search("ghi")
     # update(event)
     # delete(event)
 
@@ -117,7 +117,7 @@ def dynamo_search(data):
     )
 
     print("dynamo_search_part")
-    pprint.pprint(res)
+    pprint.pprint(res.Item)
 
     return
 
