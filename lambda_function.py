@@ -19,26 +19,13 @@ def lambda_handler(event, context):
     res = ""
     body = ""
     res_dict = ""
-    
-   
-    
-    # token = os.environ["SLACK_OAUTH_TOKEN"]
-   
-
-
 
     # dynamoDB
+    print("dynamo part")
     dynamo_operate()
 
 
 
-
-
-
-
-
-
-    # pprint.pprint(token)
 
     if event:
         body = base64.b64decode(event["body"]).decode("utf-8")
@@ -68,24 +55,17 @@ def lambda_handler(event, context):
    
 
     # # Open DM
-    # dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
-    # pprint.pprint(dm_open_url)
-    # method = "GET"
-    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    # # body = json.dumps(data).encode("utf-8")
-    # request = urllib.request.Request(
-    #     url=dm_open_url,
-    #     # data=body,
-    #     method=method,
-    #     headers=headers
-    # )
-    # with urllib.request.urlopen(request) as res:
-    #     ans = res.read()    
-    #     ans = ans.json()
-    #     print("GET OK")
-    #     pprint.pprint(ans)
+    dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
+    print("dm open url")
+    pprint.pprint(dm_open_url)
 
-    # print("get DM channel")
+    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+
+    dm_open_res = requests.get(dm_open_url, headers=headers)
+    print("get DM channel")
+    pprint.pprint(dm_open_res)
+
+   
 
 
 
@@ -107,13 +87,13 @@ def lambda_handler(event, context):
 def dynamo_operate():
 
     data = {
-        "user_id": "abc",
-        "attr1": "attr1",
-        "attr2": "attr2"
+        "user_id": "def",
+        "attr1": "attr11",
+        "attr2": "attr22"
     }
     
     dynamo_insert(data)
-    dynamo_search("abc")
+    dynamo_search("def")
     # update(event)
     # delete(event)
 
@@ -136,6 +116,7 @@ def dynamo_search(data):
         }
     )
 
+    print("dynamo_search_part")
     pprint.pprint(res)
 
     return
