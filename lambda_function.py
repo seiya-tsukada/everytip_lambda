@@ -10,7 +10,7 @@ import boto3
 
 token = os.environ["SLACK_OAUTH_TOKEN"]
 
-dynamodb = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb", region_name = "ap-northeast-1")
 table = dynamodb.Table("fpos_db")
 
 def lambda_handler(event, context):
@@ -111,8 +111,9 @@ def dynamo_operate():
         "attr1": "attr1",
         "attr2": "attr2"
     }
-    # search(event)
+    
     dynamo_insert(data)
+    dynamo_search("abc")
     # update(event)
     # delete(event)
 
@@ -125,6 +126,19 @@ def dynamo_insert(data):
     )
     return
 
+def dynamo_search(data):
+    
+    res = ""
+
+    res = table.get_item(
+        Key={
+            "user_id": data
+        }
+    )
+
+    pprint.pprint(res)
+
+    return
 
 
 def post_message_to_the_channel(data):
