@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     res_dict = ""
     text = ""
    
-    url = "https://slack.com/api/chat.postMessage"
+    chat_url = "https://slack.com/api/chat.postMessage"
     token = env = os.environ["SLACK_OAUTH_TOKEN"]
    
     # pprint.pprint(token)
@@ -46,17 +46,59 @@ def lambda_handler(event, context):
     pprint.pprint(res_dict)
     pprint.pprint(res["text"])
    
+
+    # Open DM
+    dm_open_url = "https://slack.com/api/conversations.open?token={token}&users={user_id}".format(token=token, user_id=res["user_id"])
+    pprint.pprint(dm_open_url)
+    method = "GET"
+    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    # body = json.dumps(data).encode("utf-8")
+    request = urllib.request.Request(
+        url=dm_open_url,
+        # data=body,
+        method=method,
+        # headers=headers
+    )
+    with urllib.request.urlopen(request) as res:
+        ans = res.read()
+        print("GET OK")
+        pprint.pprint(ans)
+
+
+
+    print("get DM channel")
+
+
+
+
+
+
+
+
     data = {
         "channel" : "fpos",
         "text" : text[0],
     }
 
-    method = 'POST'
+
+
+
+
+
+
+
+
+
+
+
+
+
+    method = "POST"
     # request_headers = { 'Content-Type': 'application/json; charset=utf-8' }
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
     body = json.dumps(data).encode("utf-8")
     request = urllib.request.Request(
-        url=url,
+        url=chat_url,
         data=body,
         method=method,
         headers=headers
@@ -71,7 +113,7 @@ def lambda_handler(event, context):
    
    
 
-    #dynamoDB
+    # dynamoDB
 
 
 
