@@ -60,7 +60,7 @@ def lambda_handler(event, context):
 
     # dynamoDB
     print("dynamo part")
-    dynamo_operate(res["user_id"][0], )
+    dynamo_operate(res["user_id"][0], text_ret["amount"])
 
 
 
@@ -71,7 +71,8 @@ def lambda_handler(event, context):
 
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
 
-    dm_open_res = requests.get(dm_open_url, headers=headers)
+    # dm_open_res = requests.get(dm_open_url, headers=headers)
+    dm_open_res = requests.post(dm_open_url, headers=headers)
     print("get DM channel")
     pprint.pprint(dm_open_res.content)
 
@@ -112,10 +113,11 @@ def text_validation(text):
     
     return ret
 
-def dynamo_operate(user_id):
+def dynamo_operate(user_id, amount):
 
     data = {
         "user_id": user_id,
+        "amount": amount,
         "attr1": "attr1111",
         "attr2": "attr2222"
     }
