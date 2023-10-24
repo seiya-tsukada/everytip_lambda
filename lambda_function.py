@@ -52,7 +52,7 @@ def lambda_handler(event, context):
     pprint.pprint(res_dict)
 
     print("res_text")
-    text_ret = text_validation(res["text"])
+    text_ret = text_validation(res["text"][0])
     pprint.pprint(text_ret)
 
     #########################
@@ -97,16 +97,17 @@ def lambda_handler(event, context):
 def text_validation(text):
 
     ret = ""
- 
-    print(text[0])
-    print(text[1])
-    print('isnumeric:', text[1].isnumeric())
-    print(text[2])
+    ts = text.split()
+    
+    print(ts[0])
+    print(ts[1])
+    print('isnumeric:', ts[1].isnumeric())
+    print(ts[2])
 
     ret = {
-        "mention_name": text[0],
-        "amount": text[1],
-        "message": text[2]
+        "mention_name": ts[0],
+        "amount": ts[1],
+        "message": ts[2]
     }
     
     return ret
