@@ -17,7 +17,7 @@ def lambda_handler(event, context):
     url = "https://slack.com/api/chat.postMessage"
     token = env = os.environ["SLACK_OAUTH_TOKEN"]
    
-    pprint.pprint(token)
+    # pprint.pprint(token)
 
     if event:
         body = base64.b64decode(event["body"]).decode("utf-8")
@@ -26,25 +26,25 @@ def lambda_handler(event, context):
         res = "hello everytip"
    
     
-
+    print("res")
     pprint.pprint(res)
-
-
-    print(res["user_id"])
-    print(res["user_name"])
-    print(res["channel_id"])
-    text = res["text"]
-    print("text: " + text[0])
    
     res_dict = {
+        "api_app_id": res["api_app_id"],
+        "channel_id": res["channel_id"],
+        "channel_name": res["channel_name"],
+        "command": res["command"],
+        "response_url": res["response_url"],
+        "team_domain": res["team_domain"],
+        "token": res["token"],
+        "trigger_id": res["trigger_id"],
         "user_id": res["user_id"],
         "user_name": res["user_name"],
-        "channel_id": res["channel_id"],
-        "text": text[0],
     }
    
-    print("text tye: " + type(text))
+    print("res_dict and res_text")
     pprint.pprint(res_dict)
+    pprint.pprint(res["text"])
    
     data = {
         "channel" : "fpos",
@@ -63,10 +63,22 @@ def lambda_handler(event, context):
     )
     with urllib.request.urlopen(request) as res:
         ans = res.read()
+        print("POST OK")
+        pprint.pprint(ans)
    
+    print("post NG")
     pprint.pprint(ans)
    
    
+
+    #dynamoDB
+
+
+
+
+
+
+
    
     return {
         'statusCode': 200,
