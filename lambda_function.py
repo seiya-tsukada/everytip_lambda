@@ -4,6 +4,7 @@ import os
 import pprint
 # import requests
 import urllib.request
+import requests
 from urllib.parse import parse_qs
 
 def lambda_handler(event, context):
@@ -17,6 +18,20 @@ def lambda_handler(event, context):
     chat_url = "https://slack.com/api/chat.postMessage"
     token = env = os.environ["SLACK_OAUTH_TOKEN"]
    
+
+
+
+    # dynamoDB
+
+
+
+
+
+
+
+
+
+
     # pprint.pprint(token)
 
     if event:
@@ -75,10 +90,6 @@ def lambda_handler(event, context):
     }
 
 
-
-
-
-
     method = "POST"
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
     body = json.dumps(data).encode("utf-8")
@@ -98,16 +109,9 @@ def lambda_handler(event, context):
    
    
 
-    # dynamoDB
+    
 
-
-
-
-
-
-
-   
     return {
         'statusCode': 200,
-        'body': res_dict
+        'body': res["text"][0]
     }
