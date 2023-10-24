@@ -20,12 +20,11 @@ def lambda_handler(event, context):
     body = ""
     res_dict = ""
 
-    # dynamoDB
-    print("dynamo part")
-    dynamo_operate()
 
 
 
+
+    # get event
 
     if event:
         body = base64.b64decode(event["body"]).decode("utf-8")
@@ -53,8 +52,17 @@ def lambda_handler(event, context):
     pprint.pprint(res_dict)
 
     print("res_text")
+    text_validation()
     pprint.pprint(res["text"])
-   
+
+    #########################
+
+
+    # dynamoDB
+    print("dynamo part")
+    dynamo_operate(res["user_id"][0])
+
+
 
     # # Open DM
     dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
@@ -86,25 +94,40 @@ def lambda_handler(event, context):
         'body': res["text"][0]
     }
 
-def dynamo_operate():
+def text_validation(text):
+
+    ret = ""
+
+
+    ret = text.split()
+    pprint.pprint(ret)
+    print(ret[0])
+    print(ret[1])
+    print('isnumeric:', ret[1].isnumeric())
+    print(ret[2])
+
+
+    return
+
+def dynamo_operate(user_id):
 
     data = {
-        "user_id": "ghi",
-        "attr1": "attr111",
-        "attr2": "attr222"
+        "user_id": user_id,
+        "attr1": "attr1111",
+        "attr2": "attr2222"
     }
     
     dynamo_insert(data)
-    dynamo_search("ghi")
+    dynamo_search(user_id)
     # update(event)
     # delete(event)
 
     return
 
-def dynamo_insert(data):
+def dynamo_insert(user_id):
     
     table.put_item(
-        Item=data
+        Item=user_id
     )
     return
 
