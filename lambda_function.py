@@ -70,22 +70,14 @@ def lambda_handler(event, context):
 
 
 
-
+    text = res["text"][0]
 
 
 
     data = {
         "channel" : "fpos",
-        "text" : res["text"][0],
+        "text" : text,
     }
-
-
-
-
-
-
-
-
 
 
 
