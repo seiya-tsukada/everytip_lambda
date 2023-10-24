@@ -89,27 +89,33 @@ def lambda_handler(event, context):
         "text" : res["text"][0],
     }
 
-
-    method = "POST"
+    # message to the channel
+    # method = "POST"
+    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    # body = json.dumps(data).encode("utf-8")
+    # request = urllib.request.Request(
+    #     url=chat_url,
+    #     data=body,
+    #     method=method,
+    #     headers=headers
+    # )
+    # with urllib.request.urlopen(request) as res:
+    #     ans = res.read()
+    #     print("POST OK")
+    #     pprint.pprint(ans)
+   
+    # print("post NG")
+    # pprint.pprint(ans)
+   
+  
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    body = json.dumps(data).encode("utf-8")
-    request = urllib.request.Request(
-        url=chat_url,
-        data=body,
-        method=method,
-        headers=headers
-    )
-    with urllib.request.urlopen(request) as res:
-        ans = res.read()
-        print("POST OK")
-        pprint.pprint(ans)
-   
-    print("post NG")
-    pprint.pprint(ans)
-   
-   
+    res = requests.post(chat_url, headers=headers, data=data)
 
-    
+    print("POST OK")
+    pprint.pprint(res)
+
+
+    ###########################
 
     return {
         'statusCode': 200,
