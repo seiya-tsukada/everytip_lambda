@@ -59,11 +59,10 @@ def lambda_handler(event, context):
         headers=headers
     )
     with urllib.request.urlopen(request) as res:
-        ans = res.read()
+        ans = res.read()    
+        ans = ans.json()
         print("GET OK")
         pprint.pprint(ans)
-
-
 
     print("get DM channel")
 
