@@ -1,5 +1,7 @@
 import json
 import base64
+import os
+import pprint
 # import requests
 import urllib.request
 from urllib.parse import parse_qs
@@ -13,8 +15,10 @@ def lambda_handler(event, context):
     text = ""
    
     url = "https://slack.com/api/chat.postMessage"
-    token = "xoxb-5099821813942-6069344184835-M9GyCFytlJt9CdXrrxglYzpM"
+    token = env = os.environ["SLACK_OAUTH_TOKEN"]
    
+    print(token)
+
     if event:
         body = base64.b64decode(event["body"]).decode("utf-8")
         res = parse_qs(body)
@@ -36,7 +40,7 @@ def lambda_handler(event, context):
     }
    
     print(type(text))
-    print(res_dict)
+    pprint.pprint(res_dict)
    
 
 
