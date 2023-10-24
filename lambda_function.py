@@ -2,11 +2,16 @@ import json
 import base64
 import os
 import pprint
-import urllib.request
 import requests
 from urllib.parse import parse_qs
+import boto3
+
+
 
 token = os.environ["SLACK_OAUTH_TOKEN"]
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("fpos_db")
 
 def lambda_handler(event, context):
     # TODO implement
@@ -23,7 +28,7 @@ def lambda_handler(event, context):
 
 
     # dynamoDB
-
+    dynamo_operate()
 
 
 
@@ -92,36 +97,41 @@ def lambda_handler(event, context):
 
     # message to the channel
     post_message_to_the_channel = data
-    
-    # method = "POST"
-    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    # body = json.dumps(data).encode("utf-8")
-    # request = urllib.request.Request(
-    #     url=chat_url,
-    #     data=body,
-    #     method=method,
-    #     headers=headers
-    # )
-    # with urllib.request.urlopen(request) as res:
-    #     ans = res.read()
-    #     print("POST OK")
-    #     pprint.pprint(ans)
-   
-    # print("post NG")
-    # pprint.pprint(ans)
-   
-    ###########################
+  
 
     return {
         'statusCode': 200,
         'body': res["text"][0]
     }
 
+def dynamo_operate():
+
+    data = {
+        "user_id": "abc",
+        "attr1": "attr1",
+        "attr2": "attr2"
+    }
+    # search(event)
+    dynamo_insert(data)
+    # update(event)
+    # delete(event)
+
+    return
+
+def dynamo_insert(data):
+    
+    table.put_item(
+        Item=data
+    )
+    return
+
+
+
 def post_message_to_the_channel(data):
 
     ret = ""
     chat_url = "https://slack.com/api/chat.postMessage"
-    
+
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
     ret = requests.post(chat_url, headers=headers, data=json.dumps(data))
 
