@@ -60,7 +60,7 @@ def lambda_handler(event, context):
 
     # dynamoDB
     print("dynamo part")
-    dynamo_operate(res["user_id"][0], text_ret["amount"])
+    dynamo_operate(res["user_id"][0], text_ret["mention_name"], text_ret["amount"])
 
 
 
@@ -113,10 +113,11 @@ def text_validation(text):
     
     return ret
 
-def dynamo_operate(user_id, amount):
+def dynamo_operate(user_id, user_name, amount):
 
     data = {
         "user_id": user_id,
+        "user_name": user_name,
         "amount": amount,
         "attr1": "attr1111",
         "attr2": "attr2222"
