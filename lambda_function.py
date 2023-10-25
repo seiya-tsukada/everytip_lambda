@@ -168,7 +168,7 @@ def dynamo_insert(user_id, user_name, amount):
 
 def dynamo_get(user_id):
     
-    print("dynamo_get_part" 1)
+    print("dynamo_get_part 1")
 
     res = ""
 
