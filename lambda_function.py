@@ -163,9 +163,9 @@ def dynamo_insert(user_id, user_name, amount):
         "TableName": DDB_TABLE_NAME,
         # "Item": data
         "Item": {
-            "user_id": user_id,
-            "user_name": user_name,
-            "wallet": amount,
+            "user_id": "user_id",
+            "user_name": "user_name",
+            "wallet": "amount",
             "attr1": "attr1111",
             "attr2": "attr2222"
         }
