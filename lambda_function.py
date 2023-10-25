@@ -118,6 +118,12 @@ def text_validation(text):
 
 def dynamo_operate(user_id, user_name, amount):
 
+    print("dynamo part in")
+    print("user_id")
+    print(user_id)
+    print(type(user_id))
+    print({"----end----"})
+
     data = {
         "user_id": user_id,
         "user_name": user_name,
