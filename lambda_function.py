@@ -164,7 +164,7 @@ def dynamo_insert(user_id, user_name, amount):
         "Item": data
     }
 
-    dynamodb.put_item(**option)
+    dynamodb.put_item(option)
 
     return
 
