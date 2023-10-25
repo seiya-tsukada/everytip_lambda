@@ -87,7 +87,7 @@ def lambda_handler(event, context):
    
 
 
-    post_message = "{to_user} は {from_user} に {amount}everytip を送りました".format(to_user=text_ret["to_mention_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
+    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(to_user=text_ret["to_mention_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
 
     data = {
         "channel": "fpos",
