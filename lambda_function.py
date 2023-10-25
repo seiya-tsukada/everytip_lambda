@@ -62,9 +62,11 @@ def lambda_handler(event, context):
 
 
     # dynamoDB
-    print("dynamo part")
-    dynamo_operate(res["user_id"][0], res["user_name"][0], text_ret["amount"])
+    print("dynamo insert part")
+    # dynamo_operate(res["user_id"][0], res["user_name"][0], text_ret["amount"])
 
+    
+    dynamo_insert(res["user_id"][0], res["user_name"][0], text_ret["amount"])
 
 
     # # Open DM
@@ -139,8 +141,18 @@ def dynamo_operate(user_id, user_name, amount):
 
     return
 
-def dynamo_insert(data):
+def dynamo_insert(user_id, user_name, amount):
     
+    data = ""
+
+    data = {
+        "user_id": user_id,
+        "user_name": user_name,
+        "wallet": amount,
+        "attr1": "attr1111",
+        "attr2": "attr2222"
+    }
+
     print("dynamo insert part in")
     print("data")
     print(data)
@@ -152,7 +164,7 @@ def dynamo_insert(data):
         "Item": data
     }
 
-    dynamodb.put_item(option)
+    dynamodb.put_item(**option)
 
     return
 
