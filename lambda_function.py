@@ -202,7 +202,7 @@ def dynamo_update(user_id):
     }
     
     res = dynamodb.update_item(**option)
-    pprint.pprint(res["Attributes"])
+    pprint.pprint(res)
  
     return
 
