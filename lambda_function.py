@@ -168,6 +168,8 @@ def dynamo_insert(user_id, user_name, amount):
 
 def dynamo_get(user_id):
     
+    print("dynamo_get_part" 1)
+
     res = ""
 
     option = {
@@ -176,8 +178,8 @@ def dynamo_get(user_id):
             "user_id": {"S": user_id}
         }
     }
-    res = dynamodb.put_item(**option)
-    print("dynamo_get_part")
+    res = dynamodb.get_item(**option)
+    
     pprint.pprint(res)
     pprint.pprint(res["Item"])
 
