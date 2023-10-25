@@ -118,11 +118,11 @@ def text_validation(text):
 
 def dynamo_operate(user_id, user_name, amount):
 
-    print("dynamo part in")
-    print("user_id")
-    print(user_id)
-    print(type(user_id))
-    print({"----end----"})
+    # print("dynamo part in")
+    # print("user_id")
+    # print(user_id)
+    # print(type(user_id))
+    # print({"----end----"})
 
     data = {
         "user_id": user_id,
@@ -141,12 +141,18 @@ def dynamo_operate(user_id, user_name, amount):
 
 def dynamo_insert(data):
     
+    print("dynamo insert part in")
+    print("data")
+    print(data)
+    print(type(data))
+    print({"----end----"})
+
     option = {
         "TableName": DDB_TABLE_NAME,
         "Item": data
     }
 
-    dynamodb.put_item(**option)
+    dynamodb.put_item(option)
 
     return
 
@@ -160,7 +166,7 @@ def dynamo_get(user_id):
             "user_id": user_id
         }
     }
-    res = dynamodb.put_item(**option)
+    res = dynamodb.put_item(option)
     print("dynamo_get_part")
     pprint.pprint(res)
     pprint.pprint(res["Item"])
@@ -183,7 +189,7 @@ def dynamo_update(data):
         }
     }
     
-    res = table.update_item(data)
+    res = dynamodb.update_item(data)
     pprint.pprint(res["Attributes"])
  
     return
