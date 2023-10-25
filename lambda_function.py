@@ -176,7 +176,7 @@ def dynamo_get(user_id):
             "user_id": {"S": user_id}
         }
     }
-    res = dynamodb.put_item(option)
+    res = dynamodb.put_item(**option)
     print("dynamo_get_part")
     pprint.pprint(res)
     pprint.pprint(res["Item"])
