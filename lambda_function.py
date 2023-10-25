@@ -67,6 +67,9 @@ def lambda_handler(event, context):
 
     
     dynamo_insert(res["user_id"][0], res["user_name"][0], text_ret["amount"])
+    dynamo_get(res["user_id"][0])
+    dynamo_update(res["user_id"][0])
+
 
 
     # # Open DM
@@ -84,11 +87,11 @@ def lambda_handler(event, context):
    
 
 
-
+    post_message = "{to_user}は{from_user}に{amount}everytipを送りました".format(to_user=res["to_mention_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
 
     data = {
         "channel": "fpos",
-        "text": res["text"][0],
+        "text": post_message,
     }
 
     # message to the channel
@@ -97,7 +100,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': res["text"][0]
+        'body': post_message
     }
 
 def text_validation(text):
@@ -144,31 +147,19 @@ def dynamo_operate(user_id, user_name, amount):
 def dynamo_insert(user_id, user_name, amount):
     
     data = ""
+    option = ""
 
     data = {
-        "user_id": user_id,
-        "user_name": user_name,
-        "wallet": amount,
-        "attr1": "attr1111",
-        "attr2": "attr2222"
+        "user_id": {"S": user_id},
+        "user_name": {"S": user_name},
+        "wallet": {"N": amount},
+        "attr1": {"S": "attr1111"},
+        "attr2": {"S": "attr2222"},
     }
-
-    print("dynamo insert part in")
-    print("data")
-    print(data)
-    print(type(data))
-    print({"----end----"})
 
     option = {
         "TableName": DDB_TABLE_NAME,
-        # "Item": data
-        "Item": {
-            "user_id": {"S": "user_id"},
-            "user_name": {"S": "user_name"},
-            "wallet": {"S": "aaa"},
-            "attr1": {"S": "attr1111"},
-            "attr2": {"S": "attr2222"}
-        }
+        "Item": data,
     }
 
     dynamodb.put_item(**option)
@@ -182,7 +173,7 @@ def dynamo_get(user_id):
     option = {
         "TableName": DDB_TABLE_NAME,
         "Key": {
-            "user_id": user_id
+            "user_id": {"S": user_id}
         }
     }
     res = dynamodb.put_item(option)
@@ -192,7 +183,7 @@ def dynamo_get(user_id):
 
     return
 
-def dynamo_update(data):
+def dynamo_update(user_id):
 
     res = ""    
     option = ""
@@ -200,15 +191,15 @@ def dynamo_update(data):
     option = {
          "TableName": DDB_TABLE_NAME,
          "Key": {
-            "user_id": user_id
+            "user_id": {"S": user_id}
         },
         "UpdateExpression": 'set attr1 = :attr1',
         'ExpressionAttributeValues': {
-            ":attr1": "test"
+            ":attr1": {"S": "test"}
         }
     }
     
-    res = dynamodb.update_item(data)
+    res = dynamodb.update_item(**option)
     pprint.pprint(res["Attributes"])
  
     return
