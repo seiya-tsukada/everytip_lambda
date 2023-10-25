@@ -10,8 +10,11 @@ import boto3
 
 token = os.environ["SLACK_OAUTH_TOKEN"]
 
-dynamodb = boto3.resource("dynamodb", region_name = "ap-northeast-1")
-table = dynamodb.Table("fpos_db")
+# dynamodb = boto3.resource("dynamodb", region_name = "ap-northeast-1")
+# table = dynamodb.Table("fpos_db")
+
+dynamodb = boto3.client("dynamodb", region_name = "ap-northeast-1")
+DDB_TABLE_NAME = "fpos_db"
 
 def lambda_handler(event, context):
     # TODO implement
@@ -118,38 +121,65 @@ def dynamo_operate(user_id, user_name, amount):
     data = {
         "user_id": user_id,
         "user_name": user_name,
-        "amount": amount,
+        "wallet": amount,
         "attr1": "attr1111",
         "attr2": "attr2222"
     }
     
     dynamo_insert(data)
-    dynamo_search(user_id)
-    # update(event)
+    dynamo_get(user_id)
+    dynamo_update(user_id)
     # delete(event)
 
     return
 
-def dynamo_insert(user_id):
+def dynamo_insert(data):
     
-    table.put_item(
-        Item=user_id
-    )
+    option = {
+        "TableName": DDB_TABLE_NAME,
+        "Item": data
+    }
+
+    dynamodb.put_item(**option)
+
     return
 
-def dynamo_search(data):
+def dynamo_get(user_id):
     
     res = ""
 
-    res = table.get_item(
-        Key={
-            "user_id": data
+    option = {
+        "TableName": DDB_TABLE_NAME,
+        "Key": {
+            "user_id": user_id
         }
-    )
-
-    print("dynamo_search_part")
+    }
+    res = dynamodb.put_item(**option)
+    print("dynamo_get_part")
+    pprint.pprint(res)
     pprint.pprint(res["Item"])
 
+    return
+
+def dynamo_update(data):
+
+    res = ""    
+    option = ""
+
+    option = {
+         "TableName": DDB_TABLE_NAME,
+         "Key": {
+            "user_id": user_id
+        },
+        "UpdateExpression": 'set attr1 = :attr1',
+        'ExpressionAttributeValues': {
+            ":attr1": "test"
+        }
+    }
+    
+    res = table.update_item(data)
+    pprint.pprint(res["Attributes"])
+ 
     return
 
 
