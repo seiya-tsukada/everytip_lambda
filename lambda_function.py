@@ -195,9 +195,10 @@ def dynamo_update(user_id):
          "Key": {
             "user_id": {"S": user_id}
         },
-        "UpdateExpression": 'set attr1 = :attr1',
+        "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
         'ExpressionAttributeValues': {
-            ":attr1": {"S": "test"}
+            ":attr1": {"S": "test"},
+            ":attr2": {"S": "abcde"},
         }
     }
     
