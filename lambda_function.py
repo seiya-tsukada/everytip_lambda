@@ -70,7 +70,7 @@ def lambda_handler(event, context):
     print("res_text")
     text_ret = text_validation(res["text"][0])
     if not isinstance(text_ret, dict): # 値がリストがリストを返却しない場合、エラー
-        print("はいっちゃってる？")
+        # print("はいっちゃってる？")
         return {
             'statusCode': 200,
             'body': text_ret
@@ -222,15 +222,35 @@ def get_user_info(from_user_name, to_user_name):
 
     print("get user info section")
 
-    # list user
-    user_list_url = "https://slack.com/api/users.list" 
-    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    # get from db
+    pprint.pprint(to_user_name)
 
-    # dm_open_res = requests.get(dm_open_url, headers=headers)
-    res = requests.get(user_list_url, headers=headers)
-    # print("get DM channel")
-    user_list_info = json.dumps(res.json(), indent=5)
-    pprint.pprint(user_list_info)
+    print("dynamo_get_part 1")
+
+    res = ""
+
+    option = {
+        "TableName": FPOS_USER_TABLE_NAME,
+        "Key": {
+            "user_name": {"S": "mochizuki"}
+        }
+    }
+    res = dynamodb.get_item(**option)
+    
+    pprint.pprint(res)
+    pprint.pprint(res["Item"])
+
+    return
+
+    # list user
+    # user_list_url = "https://slack.com/api/users.list" 
+    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+
+    # # dm_open_res = requests.get(dm_open_url, headers=headers)
+    # res = requests.get(user_list_url, headers=headers)
+    # # print("get DM channel")
+    # user_list_info = json.dumps(res.json(), indent=5)
+    # pprint.pprint(user_list_info)
 
     # res = ""
 
