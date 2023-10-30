@@ -78,7 +78,7 @@ def lambda_handler(event, context):
     from_user_name = ""
     from_user_name = res["user_name"][0]
     to_user_name = ""
-    to_user_name = to_user=text_ret["to_mention_name"]
+    to_user_name = to_user=text_ret["to_user_name"]
                                     
     user_info = ""
 
@@ -119,7 +119,7 @@ def lambda_handler(event, context):
    
 
 
-    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(to_user=text_ret["to_mention_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
+    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(to_user=text_ret["to_user_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
 
     data = {
         "channel": "fpos",
@@ -139,14 +139,26 @@ def text_validation(text):
 
     ret = ""
     ts = text.split()
+    message = ""
     
     print(ts[0])
     print(ts[1])
-    print('isnumeric:', ts[1].isnumeric())
     print(ts[2])
 
+    if ts.len() != 3:
+        message = "invalid parameter"
+
+    if not ts[1].isnumeric():
+        message = "invalid format of amount information"
+
+    if not message:
+        return {
+            'statusCode': 400,
+            'body': message
+        } 
+
     ret = {
-        "to_mention_name": ts[0],
+        "to_user_name": ts[0],
         "amount": ts[1],
         "message": ts[2]
     }
@@ -208,9 +220,10 @@ def get_user_info(from_user_name, to_user_name):
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
 
     # dm_open_res = requests.get(dm_open_url, headers=headers)
-    user_list = requests.get(user_list_url, headers=headers)
+    res = requests.get(user_list_url, headers=headers)
     # print("get DM channel")
-    pprint.pprint(user_list.content)
+    user_list_info = json.dumps(res.json(), indent=5)
+    pprint.pprint(user_list_info)
 
     # res = ""
 
