@@ -145,6 +145,8 @@ def text_validation(text):
     # print(ts[1])
     # print(ts[2])
 
+    print(ts.len())
+
     if ts.len() != 3:
         message = "invalid parameter"
 
