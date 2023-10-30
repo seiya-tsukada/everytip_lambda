@@ -15,8 +15,19 @@ token = os.environ["SLACK_OAUTH_TOKEN"]
 
 dynamodb = boto3.client("dynamodb", region_name = "ap-northeast-1")
 DDB_TABLE_NAME = "fpos_db"
+FPOS_USER_TABLE_NAME = "fpos_user_db"
 
 def lambda_handler(event, context):
+    
+    #################
+    # list of procedure
+    # 1. parse event
+    # 2. get to from user information 
+    
+    
+    
+    
+    
     # TODO implement
    
     res = ""
@@ -24,7 +35,8 @@ def lambda_handler(event, context):
     res_dict = ""
     text_ret = ""
 
-
+    user_id = ""
+    user_name = ""
 
 
     # get event
@@ -61,7 +73,27 @@ def lambda_handler(event, context):
     #########################
 
 
+    from_user_id = ""
+    from_user_id = res["user_id"][0]
+    from_user_name = ""
+    from_user_name = res["user_name"][0]
+    to_user_name = ""
+    to_user_name = to_user=text_ret["to_mention_name"]
+                                    
+    user_info = ""
+
+
     # dynamoDB
+    print("dynamo get part")
+    user_info = get_user_info(from_user_name, to_user_name)
+
+    pprint.pprint(user_info)
+
+
+    # test
+    return
+
+
     print("dynamo insert part")
     # dynamo_operate(res["user_id"][0], res["user_name"][0], text_ret["amount"])
 
@@ -165,6 +197,38 @@ def dynamo_insert(user_id, user_name, amount):
     dynamodb.put_item(**option)
 
     return
+
+
+def get_user_info(from_user_name, to_user_name):
+
+    print("get user info section")
+
+    # list user
+    user_list_url = "https://slack.com/api/users.list" 
+    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+
+    # dm_open_res = requests.get(dm_open_url, headers=headers)
+    user_list = requests.post(user_list_url, headers=headers)
+    # print("get DM channel")
+    pprint.pprint(user_list)
+
+    # res = ""
+
+    # option = {
+    #     "TableName": DDB_TABLE_NAME,
+    #     "Key": {
+    #         "user_id": {"S": user_id}
+    #     }
+    # }
+    # res = dynamodb.get_item(**option)
+    
+    # pprint.pprint(res)
+    # pprint.pprint(res["Item"])
+
+    return
+
+
+
 
 def dynamo_get(user_id):
     
