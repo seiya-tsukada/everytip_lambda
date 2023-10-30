@@ -208,9 +208,9 @@ def get_user_info(from_user_name, to_user_name):
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
 
     # dm_open_res = requests.get(dm_open_url, headers=headers)
-    user_list = requests.post(user_list_url, headers=headers)
+    user_list = requests.get(user_list_url, headers=headers)
     # print("get DM channel")
-    pprint.pprint(user_list)
+    pprint.pprint(user_list.content)
 
     # res = ""
 
