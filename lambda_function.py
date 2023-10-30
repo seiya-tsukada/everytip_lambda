@@ -69,7 +69,7 @@ def lambda_handler(event, context):
 
     print("res_text")
     text_ret = text_validation(res["text"][0])
-    if not isinstance(text_ret, list): # 値がリストがリストを返却しない場合、エラー
+    if not isinstance(text_ret, dict): # 値がリストがリストを返却しない場合、エラー
         print("はいっちゃってる？")
         return {
             'statusCode': 200,
