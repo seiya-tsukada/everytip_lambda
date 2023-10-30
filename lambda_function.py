@@ -3,9 +3,10 @@ import base64
 import os
 import pprint
 import requests
+import sys
 from urllib.parse import parse_qs
-import boto3
 
+import boto3
 
 
 token = os.environ["SLACK_OAUTH_TOKEN"]
@@ -68,6 +69,13 @@ def lambda_handler(event, context):
 
     print("res_text")
     text_ret = text_validation(res["text"][0])
+    if not isinstance(text_ret, list): # 値がリストがリストを返却しない場合、エラー
+        return {
+            'statusCode': 200,
+            'body': text_ret
+        }
+
+
     pprint.pprint(text_ret)
 
     #########################
@@ -149,18 +157,12 @@ def text_validation(text):
 
     if len(ts) != 3:
         message = "invalid parameter"
-        return {
-            'statusCode': 400,
-            'body': message
-        } 
-
+        return message
+       
     if not ts[1].isnumeric():
         message = "invalid format of amount information"
-        return {
-            'statusCode': 400,
-            'body': message
-        } 
-
+        return message
+        
     ret = {
         "to_user_name": ts[0],
         "amount": ts[1],
