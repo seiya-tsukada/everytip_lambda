@@ -141,9 +141,9 @@ def text_validation(text):
     ts = text.split()
     message = ""
     
-    print(ts[0])
-    print(ts[1])
-    print(ts[2])
+    # print(ts[0])
+    # print(ts[1])
+    # print(ts[2])
 
     if ts.len() != 3:
         message = "invalid parameter"
