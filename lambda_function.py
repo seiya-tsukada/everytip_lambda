@@ -149,11 +149,13 @@ def text_validation(text):
 
     if len(ts) != 3:
         message = "invalid parameter"
+        return {
+            'statusCode': 400,
+            'body': message
+        } 
 
     if not ts[1].isnumeric():
         message = "invalid format of amount information"
-
-    if not message:
         return {
             'statusCode': 400,
             'body': message
