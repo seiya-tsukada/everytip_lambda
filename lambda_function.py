@@ -212,7 +212,8 @@ def text_validation(text):
         return message
     
     ret = {
-        "to_user_name": ts[0].removeprefix("@"), # remove @ (mention prefix)
+        # remove @ (mention prefix)
+        "to_user_name": ts[0].removeprefix("@"),
         "amount": ts[1],
         "message": ts[2]
     }
@@ -290,9 +291,9 @@ def user_validation(from_user, to_user):
 
 def grant_tip(from_user, to_user, amount):
 
-    ret = ""
+    print("grant tip ret function")
 
-    if from_user["wallet"] - amount <= 0:
+    if int(from_user["wallet"]["N"]) - int(amount) <= 0:
         message = "{} is not enough tip".format(to_user["user_name"])
         return message
     
@@ -302,16 +303,16 @@ def grant_tip(from_user, to_user, amount):
 
     # 4. update from user and to user (to fpos_user_db)
     # grant money
-    update_user_information(from_user, from_user["wallet"] + amount)
+    update_user_information(from_user, int(from_user["wallet"]["N"]) + int(amount))
     
     # subtract money
-    update_user_information(to_user, to_user["wallet"] + amount)
+    update_user_information(to_user, int(to_user["wallet"]["N"]) + int(amount))
 
     return "SUCCESS"
 
 def update_user_information(user, amount):
 
-    print("update " + user["user_name"] + " information")
+    print("update " + user["user_name"]["S"] + " information")
 
     res = ""
     option = ""
@@ -330,35 +331,36 @@ def update_user_information(user, amount):
     option = {
         "TableName": FPOS_USER_TABLE_NAME,
         "Key": {
-           "user_id": {"S": user["user_id"]}
+           "user_id": {"S": user["user_id"]["S"]}
         },
         "UpdateExpression": "set wallet = :wallet",
         'ExpressionAttributeValues': {
             ":wallet": {"N": amount},
         }
     }
+
+    pprint.pprint(option)
     res = dynamodb.update_item(**option)
  
     return res["ResponseMetadata"]["HTTPStatusCode"]
 
 def insert_transaction_information(from_user, to_user, amount):
 
-    print("insert {0} {1} information".format(from_user["user_name"]), to_user["user_name"])
+    print("insert {0} {1} information".format(from_user["user_name"]["S"], to_user["user_name"]["S"]))
  
     data = ""
     option = ""
 
     data = {
         "id": {"S": "et_"+str(int(time.time() * 1000))},
-        "from_user_id": {"S": from_user["user_id"]},
-        "from_user_name": {"S": from_user["user_name"]},
-        "to_user_id": {"S": to_user["user_id"]},
-        "to_user_name": {"S": to_user["user_name"]},
+        "from_user_id": {"S": from_user["user_id"]["S"]},
+        "from_user_name": {"S": from_user["user_name"]["S"]},
+        "to_user_id": {"S": to_user["user_id"]["S"]},
+        "to_user_name": {"S": to_user["user_name"]["S"]},
         "amount": {"N": amount},
         "created_at": {"S": datetime.now().isoformat(timespec="seconds")},
     }
 
-    print("insert data")
     pprint.pprint(data)
 
     option = {
