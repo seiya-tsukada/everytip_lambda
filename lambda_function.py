@@ -294,7 +294,7 @@ def grant_tip(from_user, to_user, amount):
     print("grant tip ret function")
 
     if int(from_user["wallet"]["N"]) - int(amount) <= 0:
-        message = "{} is not enough tip".format(to_user["user_name"])
+        message = "{} is not enough tip".format(from_user["user_name"]["S"])
         return message
     
     # 3.1. insert transaction (to fpos_tips)
