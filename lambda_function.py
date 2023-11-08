@@ -5,6 +5,8 @@ import pprint
 import requests
 import sys
 from urllib.parse import parse_qs
+from datetime import datetime
+import time
 
 import boto3
 
@@ -15,42 +17,51 @@ token = os.environ["SLACK_OAUTH_TOKEN"]
 # table = dynamodb.Table("fpos_db")
 
 dynamodb = boto3.client("dynamodb", region_name = "ap-northeast-1")
-DDB_TABLE_NAME = "fpos_db"
+# DDB_TABLE_NAME = "fpos_db"
+FPOS_TIPS_TABLE_NAME = "fpos_tips"
 FPOS_USER_TABLE_NAME = "fpos_user_db"
 
 def lambda_handler(event, context):
     
     #################
     # list of procedure
-    # 1. parse event
-    # 2. get to from user information 
-    
-    
-    
-    
-    
-    # TODO implement
-   
+    # 1. get and parse event
+    # 1.1. validation format from text in event
+    # 2. get to and from user information (from fpos_user_db)
+    # 2.1. judgement whether available user or not
+    # 3. grant tip from user to to user
+    # 3.1. insert transaction (to fpos_tips)
+    # 4. update from user and to user (to fpos_user_db)
+    # 5. send notification via slack and response
+    #
+    #
+    #################
+
+    # initialize
     res = ""
     body = ""
-    res_dict = ""
+    res_dict = {}
     text_ret = ""
 
     user_id = ""
     user_name = ""
 
 
-    # get event
 
+    # 1. get and parse event
     if event:
         body = base64.b64decode(event["body"]).decode("utf-8")
         res = parse_qs(body)
     else:
-        res = "hello everytip"
+        return {
+            'statusCode': 500,
+            'body': "internal service error"
+        }
        
     # print("res")
     # pprint.pprint(res)
    
+    # parse event
     res_dict = {
         "api_app_id": res["api_app_id"][0],
         "channel_id": res["channel_id"][0],
@@ -64,44 +75,83 @@ def lambda_handler(event, context):
         "user_name": res["user_name"][0],
     }
    
-    print("res_dict")
-    pprint.pprint(res_dict)
-
-    print("res_text")
-    text_ret = text_validation(res["text"][0])
-    if not isinstance(text_ret, dict): # 値がリストがリストを返却しない場合、エラー
-        # print("はいっちゃってる？")
+    # print("res_dict")
+    # pprint.pprint(res_dict)
+  
+    # 1.1. validation format from text in event
+    text_ret = text_validation(res["text"][0]) # format is [to_user*] [amount*] [message*]
+    if not isinstance(text_ret, dict): # Error if text_ret does not have a list
         return {
-            'statusCode': 200,
+            'statusCode': 400,
             'body': text_ret
         }
-
-
+    
+    print("text ret")
     pprint.pprint(text_ret)
+
+
 
     #########################
 
 
-    from_user_id = ""
-    from_user_id = res["user_id"][0]
-    from_user_name = ""
-    from_user_name = res["user_name"][0]
-    to_user_name = ""
-    to_user_name = to_user=text_ret["to_user_name"]
-                                    
-    user_info = ""
 
+    # 2. get to and from user information (from fpos_user_db)
+    # get from user information
+    from_user_info = ""
+    from_user_info = get_user_info(res["user_name"][0])
+    if not isinstance(from_user_info, dict): # Error if text_ret does not have a list
+        return {
+            'statusCode': 400,
+            'body': "{} is not found".format(res["user_name"][0])
+        }
 
-    # dynamoDB
-    print("dynamo get part")
-    user_info = get_user_info(from_user_name, to_user_name)
+    # get to user information
+    to_user_info = ""
+    to_user_info = get_user_info(text_ret["to_user_name"])
+    if not isinstance(to_user_info, dict): # Error if text_ret does not have a list
+        return {
+            'statusCode': 400,
+            'body': "{} is not found".format(res["user_name"][0])
+        }
 
-    pprint.pprint(user_info)
+    print("print: from_user_info")
+    pprint.pprint(from_user_info)
+    print("print: to_user_info")
+    pprint.pprint(to_user_info)
 
+    # 2.1. judgement whether available user or not
+    user_val_ret = ""
+    user_val_ret = user_validation(from_user_info, to_user_info)
 
-    # test
-    return
+    print("user val ret")
+    pprint.pprint(user_val_ret)
+    if user_val_ret != "SUCCESS": # Error if user_val_ret is False
+        return {
+            'statusCode': 400,
+            'body': user_val_ret
+        }
+    
+    # 3. grant tip from user to to user
+    grant_tip_ret = ""
+    grant_tip_ret = grant_tip(from_user_info, to_user_info, text_ret["amount"])
 
+    print("grant tip ret")
+    pprint.pprint(grant_tip_ret)
+    if grant_tip_ret != "SUCCESS": # Error if grant_tip_ret is False
+        return {
+            'statusCode': 400,
+            'body': "grant operation is failed"
+        }
+    
+    # 5. send notification via slack and response
+    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user_info["user_name"], to_user=to_user_info["user_name"], amount=text_ret["amount"])
+    print("post message")
+    print(post_message)
+
+    return {
+        'statusCode': 200,
+        'body': post_message
+    }
 
     print("dynamo insert part")
     # dynamo_operate(res["user_id"][0], res["user_name"][0], text_ret["amount"])
@@ -154,7 +204,7 @@ def text_validation(text):
     # print(ts[1])
     # print(ts[2])
 
-    print(len(ts))
+    print("res_text")
 
     if len(ts) != 3:
         message = "invalid parameter"
@@ -172,144 +222,199 @@ def text_validation(text):
     
     return ret
 
-def dynamo_operate(user_id, user_name, amount):
+# def dynamo_operate(user_id, user_name, amount):
 
-    # print("dynamo part in")
-    # print("user_id")
-    # print(user_id)
-    # print(type(user_id))
-    # print({"----end----"})
+#     # print("dynamo part in")
+#     # print("user_id")
+#     # print(user_id)
+#     # print(type(user_id))
+#     # print({"----end----"})
 
-    data = {
-        "user_id": user_id,
-        "user_name": user_name,
-        "wallet": amount,
-        "attr1": "attr1111",
-        "attr2": "attr2222"
-    }
+#     data = {
+#         "user_id": user_id,
+#         "user_name": user_name,
+#         "wallet": amount,
+#         "attr1": "attr1111",
+#         "attr2": "attr2222"
+#     }
     
-    dynamo_insert(data)
-    dynamo_get(user_id)
-    dynamo_update(user_id)
-    # delete(event)
+#     dynamo_insert(data)
+#     dynamo_get(user_id)
+#     dynamo_update(user_id)
+#     # delete(event)
 
-    return
-
-def dynamo_insert(user_id, user_name, amount):
-    
-    data = ""
-    option = ""
-
-    data = {
-        "user_id": {"S": user_id},
-        "user_name": {"S": user_name},
-        "wallet": {"N": amount},
-        "attr1": {"S": "attr1111"},
-        "attr2": {"S": "attr2222"},
-    }
-
-    option = {
-        "TableName": DDB_TABLE_NAME,
-        "Item": data,
-    }
-
-    dynamodb.put_item(**option)
-
-    return
+#     return
 
 
-def get_user_info(from_user_name, to_user_name):
 
-    print("get user info section")
+def get_user_info(user_name):
 
-    # get from db
-    pprint.pprint(to_user_name)
-
-    print("dynamo_get_part 1")
+    print("get " + user_name +  " info section")
 
     res = ""
 
     option = {
         "TableName": FPOS_USER_TABLE_NAME,
-        "Key": {
-            "user_name": {"S": "mochizuki"}
+        "IndexName": "GSI-user_name",
+        "KeyConditionExpression": "user_name = :user_name",
+        "ExpressionAttributeValues": {
+        ":user_name": {
+            "S": user_name}
+
         }
     }
-    res = dynamodb.get_item(**option)
+    res = dynamodb.query(**option)
     
-    pprint.pprint(res)
-    pprint.pprint(res["Item"])
+    if res["Count"] > 0:
+        return res["Items"][0]
+    else:
+        return None
 
-    return
+def user_validation(from_user, to_user):
 
-    # list user
-    # user_list_url = "https://slack.com/api/users.list" 
-    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    print("in user validation function")
+    print("from_user")
+    pprint.pprint(from_user)
+    print("to_user")
+    pprint.pprint(from_user)
 
-    # # dm_open_res = requests.get(dm_open_url, headers=headers)
-    # res = requests.get(user_list_url, headers=headers)
-    # # print("get DM channel")
-    # user_list_info = json.dumps(res.json(), indent=5)
-    # pprint.pprint(user_list_info)
+    # is available? from_user
+    if not from_user["is_available"]["BOOL"]:
+        message = "{} is not available".format(from_user["user_name"])
+        return message
 
-    # res = ""
-
-    # option = {
-    #     "TableName": DDB_TABLE_NAME,
-    #     "Key": {
-    #         "user_id": {"S": user_id}
-    #     }
-    # }
-    # res = dynamodb.get_item(**option)
+    # is available? to_user
+    if not to_user["is_available"]["BOOL"]:
+        message = "{} is not available".format(to_user["user_name"])
+        return message
     
-    # pprint.pprint(res)
-    # pprint.pprint(res["Item"])
-
-    return
+    return "SUCCESS"
 
 
+def grant_tip(from_user, to_user, amount):
 
+    ret = ""
 
-def dynamo_get(user_id):
+    if from_user["wallet"] - amount <= 0:
+        message = "{} is not enough tip".format(to_user["user_name"])
+        return message
     
-    print("dynamo_get_part 1")
+    # 3.1. insert transaction (to fpos_tips)
+    # insert transaction information
+    insert_transaction_information(from_user, to_user, amount)
+
+    # 4. update from user and to user (to fpos_user_db)
+    # grant money
+    update_user_information(from_user, from_user["wallet"] + amount)
+    
+    # subtract money
+    update_user_information(to_user, to_user["wallet"] + amount)
+
+    return "SUCCESS"
+
+def update_user_information(user, amount):
+
+    print("update " + user["user_name"] + " information")
 
     res = ""
-
-    option = {
-        "TableName": DDB_TABLE_NAME,
-        "Key": {
-            "user_id": {"S": user_id}
-        }
-    }
-    res = dynamodb.get_item(**option)
-    
-    pprint.pprint(res)
-    pprint.pprint(res["Item"])
-
-    return
-
-def dynamo_update(user_id):
-
-    res = ""    
     option = ""
 
+    # option = {
+    #      "TableName": FPOS_USER_TABLE_NAME,
+    #      "Key": {
+    #         "user_id": {"S": user_id}
+    #     },
+    #     "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
+    #     'ExpressionAttributeValues': {
+    #         ":attr1": {"S": "test"},
+    #         ":attr2": {"S": "abcde"},
+    #     }
+    # }
     option = {
-         "TableName": DDB_TABLE_NAME,
-         "Key": {
-            "user_id": {"S": user_id}
+        "TableName": FPOS_USER_TABLE_NAME,
+        "Key": {
+           "user_id": {"S": user["user_id"]}
         },
-        "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
+        "UpdateExpression": "set wallet = :wallet",
         'ExpressionAttributeValues': {
-            ":attr1": {"S": "test"},
-            ":attr2": {"S": "abcde"},
+            ":wallet": {"N": amount},
         }
     }
-    
     res = dynamodb.update_item(**option)
-    pprint.pprint(res)
  
-    return
+    return res["ResponseMetadata"]["HTTPStatusCode"]
+
+def insert_transaction_information(from_user, to_user, amount):
+
+    print("insert {0} {1} information".format(from_user["user_name"]), to_user["user_name"])
+ 
+    data = ""
+    option = ""
+
+    data = {
+        "id": {"S": "et_"+str(int(time.time() * 1000))},
+        "from_user_id": {"S": from_user["user_id"]},
+        "from_user_name": {"S": from_user["user_name"]},
+        "to_user_id": {"S": to_user["user_id"]},
+        "to_user_name": {"S": to_user["user_name"]},
+        "amount": {"N": amount},
+        "created_at": {"S": datetime.now().isoformat(timespec="seconds")},
+    }
+
+    print("insert data")
+    pprint.pprint(data)
+
+    option = {
+        "TableName": FPOS_TIPS_TABLE_NAME,
+        "Item": data,
+    }
+
+    dynamodb.put_item(**option)
+
+    return "SUCCESS"
+
+
+
+# def dynamo_get(user_id):
+    
+#     print("dynamo_get_part 1")
+
+#     res = ""
+
+#     option = {
+#         "TableName": DDB_TABLE_NAME,
+#         "Key": {
+#             "user_id": {"S": user_id}
+#         }
+#     }
+#     res = dynamodb.get_item(**option)
+    
+#     pprint.pprint(res)
+#     pprint.pprint(res["Item"])
+
+#     return
+
+# def dynamo_update(user_id):
+
+#     res = ""    
+#     option = ""
+
+#     option = {
+#          "TableName": DDB_TABLE_NAME,
+#          "Key": {
+#             "user_id": {"S": user_id}
+#         },
+#         "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
+#         'ExpressionAttributeValues': {
+#             ":attr1": {"S": "test"},
+#             ":attr2": {"S": "abcde"},
+#         }
+#     }
+    
+#     res = dynamodb.update_item(**option)
+#     pprint.pprint(res)
+ 
+#     return
 
 
 def post_message_to_the_channel(data):
