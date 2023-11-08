@@ -99,6 +99,8 @@ def lambda_handler(event, context):
     # get from user information
     from_user_info = ""
     from_user_info = get_user_info(res["user_name"][0])
+    print("print: from_user_info")
+    pprint.pprint(from_user_info)
     if not isinstance(from_user_info, dict): # Error if text_ret does not have a list
         return {
             'statusCode': 400,
@@ -108,16 +110,13 @@ def lambda_handler(event, context):
     # get to user information
     to_user_info = ""
     to_user_info = get_user_info(text_ret["to_user_name"])
+    print("print: to_user_info")
+    pprint.pprint(to_user_info)
     if not isinstance(to_user_info, dict): # Error if text_ret does not have a list
         return {
             'statusCode': 400,
             'body': "{} is not found".format(res["user_name"][0])
         }
-
-    print("print: from_user_info")
-    pprint.pprint(from_user_info)
-    print("print: to_user_info")
-    pprint.pprint(to_user_info)
 
     # 2.1. judgement whether available user or not
     user_val_ret = ""
@@ -204,8 +203,6 @@ def text_validation(text):
     # print(ts[1])
     # print(ts[2])
 
-    print("res_text")
-
     if len(ts) != 3:
         message = "invalid parameter"
         return message
@@ -213,9 +210,9 @@ def text_validation(text):
     if not ts[1].isnumeric():
         message = "invalid format of amount information"
         return message
-        
+    
     ret = {
-        "to_user_name": ts[0],
+        "to_user_name": ts[0].removeprefix("@"), # remove @ (mention prefix)
         "amount": ts[1],
         "message": ts[2]
     }
