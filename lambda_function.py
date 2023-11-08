@@ -143,7 +143,7 @@ def lambda_handler(event, context):
         }
     
     # 5. send notification via slack and response
-    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user_info["user_name"], to_user=to_user_info["user_name"], amount=text_ret["amount"])
+    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user=from_user_info["user_name"]["S"], to_user=to_user_info["user_name"]["S"], amount=text_ret["amount"])
     print("post message")
     print(post_message)
 
@@ -303,7 +303,7 @@ def grant_tip(from_user, to_user, amount):
 
     # 4. update from user and to user (to fpos_user_db)
     # grant money
-    update_user_information(from_user, int(from_user["wallet"]["N"]) + int(amount))
+    update_user_information(from_user, int(from_user["wallet"]["N"]) - int(amount))
     
     # subtract money
     update_user_information(to_user, int(to_user["wallet"]["N"]) + int(amount))
