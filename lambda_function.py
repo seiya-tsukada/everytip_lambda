@@ -293,7 +293,7 @@ def grant_tip(from_user, to_user, amount):
 
     print("grant tip ret function")
 
-    if int(from_user["wallet"]["N"]) - int(amount) <= 0:
+    if int(from_user["wallet"]["N"]) - int(amount) < 0:
         message = "{} is not enough tip".format(from_user["user_name"]["S"])
         return message
     
