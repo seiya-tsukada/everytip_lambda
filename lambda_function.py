@@ -335,7 +335,7 @@ def update_user_information(user, amount):
         },
         "UpdateExpression": "set wallet = :wallet",
         'ExpressionAttributeValues': {
-            ":wallet": {"N": amount},
+            ":wallet": {"N": str(amount)},
         }
     }
 
