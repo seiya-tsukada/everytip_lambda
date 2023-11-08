@@ -239,14 +239,19 @@ def user_validation(from_user, to_user):
     print("to_user")
     pprint.pprint(from_user)
 
+    # Fail if from user and to user are the same person.
+    if from_user["user_id"]["S"] == to_user["user_id"]["S"]:
+        message = "{0} and {1} is are same person".format(from_user["user_name"]["S"], to_user["user_name"]["S"])
+        return message
+
     # is available? from_user
     if not from_user["is_available"]["BOOL"]:
-        message = "{} is not available".format(from_user["user_name"])
+        message = "{} is not available".format(from_user["user_name"]["S"])
         return message
 
     # is available? to_user
     if not to_user["is_available"]["BOOL"]:
-        message = "{} is not available".format(to_user["user_name"])
+        message = "{} is not available".format(to_user["user_name"]["S"])
         return message
     
     return "SUCCESS"
