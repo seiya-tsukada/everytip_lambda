@@ -3,7 +3,6 @@ import base64
 import os
 import pprint
 import requests
-import sys
 from urllib.parse import parse_qs
 from datetime import datetime
 import time
@@ -147,51 +146,40 @@ def lambda_handler(event, context):
     print("post message")
     print(post_message)
 
-    return {
-        'statusCode': 200,
-        'body': post_message
-    }
-
-    print("dynamo insert part")
-    # dynamo_operate(res["user_id"][0], res["user_name"][0], text_ret["amount"])
-
-    
-    dynamo_insert(res["user_id"][0], res["user_name"][0], text_ret["amount"])
-    dynamo_get(res["user_id"][0])
-    dynamo_update(res["user_id"][0])
-
-
-
-    # # Open DM
-    dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
-    print("dm open url")
-    pprint.pprint(dm_open_url)
-
-    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-
-    # dm_open_res = requests.get(dm_open_url, headers=headers)
-    dm_open_res = requests.post(dm_open_url, headers=headers)
-    print("get DM channel")
-    pprint.pprint(dm_open_res.content)
-
-   
-
-
-    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(to_user=text_ret["to_user_name"], from_user=res["user_name"][0], amount=text_ret["amount"])
-
+    data = {}
     data = {
         "channel": "fpos",
         "text": post_message,
     }
 
     # message to the channel
-    post_message_to_the_channel = data
-  
+    post_message_to_the_channel(data)
 
     return {
         'statusCode': 200,
         'body': post_message
     }
+ 
+
+    # # # Open DM
+    # dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
+    # print("dm open url")
+    # pprint.pprint(dm_open_url)
+
+    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+
+    # # dm_open_res = requests.get(dm_open_url, headers=headers)
+    # dm_open_res = requests.post(dm_open_url, headers=headers)
+    # print("get DM channel")
+    # pprint.pprint(dm_open_res.content)
+
+   
+
+
+
+  
+
+
 
 def text_validation(text):
 
@@ -219,31 +207,6 @@ def text_validation(text):
     }
     
     return ret
-
-# def dynamo_operate(user_id, user_name, amount):
-
-#     # print("dynamo part in")
-#     # print("user_id")
-#     # print(user_id)
-#     # print(type(user_id))
-#     # print({"----end----"})
-
-#     data = {
-#         "user_id": user_id,
-#         "user_name": user_name,
-#         "wallet": amount,
-#         "attr1": "attr1111",
-#         "attr2": "attr2222"
-#     }
-    
-#     dynamo_insert(data)
-#     dynamo_get(user_id)
-#     dynamo_update(user_id)
-#     # delete(event)
-
-#     return
-
-
 
 def get_user_info(user_name):
 
@@ -317,17 +280,6 @@ def update_user_information(user, amount):
     res = ""
     option = ""
 
-    # option = {
-    #      "TableName": FPOS_USER_TABLE_NAME,
-    #      "Key": {
-    #         "user_id": {"S": user_id}
-    #     },
-    #     "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
-    #     'ExpressionAttributeValues': {
-    #         ":attr1": {"S": "test"},
-    #         ":attr2": {"S": "abcde"},
-    #     }
-    # }
     option = {
         "TableName": FPOS_USER_TABLE_NAME,
         "Key": {
@@ -372,7 +324,18 @@ def insert_transaction_information(from_user, to_user, amount):
 
     return "SUCCESS"
 
+def post_message_to_the_channel(data):
 
+    ret = ""
+    chat_url = "https://slack.com/api/chat.postMessage"
+
+    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
+    ret = requests.post(chat_url, headers=headers, data=json.dumps(data))
+
+    print("POST OK")
+    pprint.pprint(ret)
+
+    return ret
 
 # def dynamo_get(user_id):
     
@@ -416,14 +379,3 @@ def insert_transaction_information(from_user, to_user, amount):
 #     return
 
 
-def post_message_to_the_channel(data):
-
-    ret = ""
-    chat_url = "https://slack.com/api/chat.postMessage"
-
-    headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    ret = requests.post(chat_url, headers=headers, data=json.dumps(data))
-
-    print("POST OK")
-
-    return ret
