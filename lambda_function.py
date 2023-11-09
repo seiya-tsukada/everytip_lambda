@@ -57,8 +57,8 @@ def lambda_handler(event, context):
             'body': "internal service error"
         }
        
-    # print("res")
-    # pprint.pprint(res)
+    print("event")
+    pprint.pprint(res)
    
     # parse event
     res_dict = {
@@ -241,7 +241,7 @@ def user_validation(from_user, to_user):
 
     # Fail if from user and to user are the same person.
     if from_user["user_id"]["S"] == to_user["user_id"]["S"]:
-        message = "{0} and {1} is are same person".format(from_user["user_name"]["S"], to_user["user_name"]["S"])
+        message = "from user and to user are same person"
         return message
 
     # is available? from_user
@@ -255,7 +255,6 @@ def user_validation(from_user, to_user):
         return message
     
     return "SUCCESS"
-
 
 def grant_tip(from_user, to_user, amount):
 
