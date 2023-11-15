@@ -162,7 +162,7 @@ def lambda_handler(event, context):
         }
 
     # message via dm "from user"
-    post_message_from_user = "残everytipは {} tip です".format(int(from_user_info["wallet"]["N"]) - int(text_ret["amount"]))
+    post_message_from_user = "{to_user} へeverytipを送りました。残everytipは {amount} tip です".format(to_user=to_user_info["user_name"]["S"], amount=int(from_user_info["wallet"]["N"]) - int(text_ret["amount"]))
     print("post message 'from user'")
     print(post_message_from_user)
     
