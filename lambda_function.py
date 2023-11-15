@@ -142,18 +142,32 @@ def lambda_handler(event, context):
         }
     
     # 5. send notification via slack and response
-    post_message = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user=from_user_info["user_name"]["S"], to_user=to_user_info["user_name"]["S"], amount=text_ret["amount"])
-    print("post message")
-    print(post_message)
+    post_message_to_user = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user=from_user_info["user_name"]["S"], to_user=to_user_info["user_name"]["S"], amount=text_ret["amount"])
+    print("post message 'to user'")
+    print(post_message_to_user)
 
     data = {}
     data = {
-        "channel": "fpos",
-        "text": post_message,
+        # "channel": conversations_open_res["channel"]["id"],
+        "text": post_message_to_user,
     }
 
-    # message to the channel
-    post_message_to_the_channel(data)
+    # message via dm "to user"
+    # post_message_via_dm(data)
+
+    post_message_from_user = "残everytipは {} tip です".format(from_user_info["amount"]["N"])
+    print("post message 'from user'")
+    print(post_message_from_user)
+
+    data = {}
+    data = {
+        # "channel": conversations_open_res["channel"]["id"],
+        "text": post_message_from_user,
+    }
+
+    # message via dm "from user"
+    # post_message_via_dm(data)
+
 
     return {
         'statusCode': 200,
@@ -328,7 +342,7 @@ def insert_transaction_information(from_user, to_user, amount):
 
     return "SUCCESS"
 
-def post_message_to_the_channel(data):
+def post_message_via_dm(data):
 
     ret = ""
     chat_url = "https://slack.com/api/chat.postMessage"
