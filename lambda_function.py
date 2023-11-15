@@ -9,7 +9,6 @@ import time
 
 import boto3
 
-
 token = os.environ["SLACK_OAUTH_TOKEN"]
 
 # dynamodb = boto3.resource("dynamodb", region_name = "ap-northeast-1")
@@ -39,13 +38,7 @@ def lambda_handler(event, context):
     # initialize
     res = ""
     body = ""
-    res_dict = {}
     text_ret = ""
-
-    user_id = ""
-    user_name = ""
-
-
 
     # 1. get and parse event
     if event:
@@ -57,10 +50,11 @@ def lambda_handler(event, context):
             'body': "internal service error"
         }
        
-    print("event")
-    pprint.pprint(res)
+    # print("print: event")
+    # pprint.pprint(res)
    
     # parse event
+    res_dict = {}
     res_dict = {
         "api_app_id": res["api_app_id"][0],
         "channel_id": res["channel_id"][0],
@@ -85,8 +79,8 @@ def lambda_handler(event, context):
             'body': text_ret
         }
     
-    print("text ret")
-    pprint.pprint(text_ret)
+    # print("text ret")
+    # pprint.pprint(text_ret)
 
 
 
@@ -128,7 +122,13 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': user_val_ret
         }
-    
+
+
+
+    #########################
+
+
+
     # 3. grant tip from user to to user
     grant_tip_ret = ""
     grant_tip_ret = grant_tip(from_user_info, to_user_info, text_ret["amount"])
@@ -140,60 +140,44 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': "grant operation is failed"
         }
+
+
+
+    #########################
+
+
     
     # 5. send notification via slack and response
+    # message via dm "to user"
     post_message_to_user = "{from_user} は {to_user} に {amount}everytip を送りました".format(from_user=from_user_info["user_name"]["S"], to_user=to_user_info["user_name"]["S"], amount=text_ret["amount"])
     print("post message 'to user'")
     print(post_message_to_user)
-
-    data = {}
-    data = {
-        # "channel": conversations_open_res["channel"]["id"],
-        "text": post_message_to_user,
-    }
-
-    # message via dm "to user"
-    # post_message_via_dm(data)
-
-    post_message_from_user = "残everytipは {} tip です".format(from_user_info["amount"]["N"])
-    print("post message 'from user'")
-    print(post_message_from_user)
-
-    data = {}
-    data = {
-        # "channel": conversations_open_res["channel"]["id"],
-        "text": post_message_from_user,
-    }
+    
+    post_message_via_dm_res = ""
+    post_message_via_dm_res = post_message_via_dm(to_user_info["user_id"]["S"], post_message_to_user)
+    if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
+        return {
+            'statusCode': 400,
+            'body': "post dm to user function is faile"
+        }
 
     # message via dm "from user"
-    # post_message_via_dm(data)
-
+    post_message_from_user = "残everytipは {} tip です".format(int(from_user_info["wallet"]["N"]) - int(text_ret["amount"]))
+    print("post message 'from user'")
+    print(post_message_from_user)
+    
+    post_message_via_dm_res = ""
+    post_message_via_dm_res = post_message_via_dm(from_user_info["user_id"]["S"], post_message_from_user)
+    if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
+        return {
+            'statusCode': 400,
+            'body': "post dm from user function is faile"
+        }
 
     return {
         'statusCode': 200,
-        'body': post_message
+        'body': "Everytip is SUCCESS"
     }
- 
-
-    # # # Open DM
-    # dm_open_url = "https://slack.com/api/conversations.open?users={user_id}".format(user_id=res["user_id"][0])
-    # print("dm open url")
-    # pprint.pprint(dm_open_url)
-
-    # headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-
-    # # dm_open_res = requests.get(dm_open_url, headers=headers)
-    # dm_open_res = requests.post(dm_open_url, headers=headers)
-    # print("get DM channel")
-    # pprint.pprint(dm_open_res.content)
-
-   
-
-
-
-  
-
-
 
 def text_validation(text):
 
@@ -247,11 +231,11 @@ def get_user_info(user_name):
 
 def user_validation(from_user, to_user):
 
-    print("in user validation function")
-    print("from_user")
-    pprint.pprint(from_user)
-    print("to_user")
-    pprint.pprint(from_user)
+    # print("in user validation function")
+    # print("from_user")
+    # pprint.pprint(from_user)
+    # print("to_user")
+    # pprint.pprint(to_user)
 
     # Fail if from user and to user are the same person.
     if from_user["user_id"]["S"] == to_user["user_id"]["S"]:
@@ -316,11 +300,8 @@ def update_user_information(user, amount):
 
 def insert_transaction_information(from_user, to_user, amount):
 
-    print("insert {0} {1} information".format(from_user["user_name"]["S"], to_user["user_name"]["S"]))
- 
     data = ""
     option = ""
-
     data = {
         "id": {"S": "et_"+str(int(time.time() * 1000))},
         "from_user_id": {"S": from_user["user_id"]["S"]},
@@ -331,6 +312,7 @@ def insert_transaction_information(from_user, to_user, amount):
         "created_at": {"S": datetime.now().isoformat(timespec="seconds")},
     }
 
+    print("print: insert {0}\(from_user\) and {1}\(to_user\) information".format(from_user["user_name"]["S"], to_user["user_name"]["S"]))
     pprint.pprint(data)
 
     option = {
@@ -342,58 +324,35 @@ def insert_transaction_information(from_user, to_user, amount):
 
     return "SUCCESS"
 
-def post_message_via_dm(data):
+def post_message_via_dm(user_id, message):
 
-    ret = ""
-    chat_url = "https://slack.com/api/chat.postMessage"
+    res = ""
+    conversations_open_res = ""
+    post_message_res = ""
+    conversations_open_url = "https://slack.com/api/conversations.open"
+    post_message_url = "https://slack.com/api/chat.postMessage"
 
     headers = { "Authorization": "Bearer {}".format(token), "Content-Type": "application/json; charset=utf-8" }
-    ret = requests.post(chat_url, headers=headers, data=json.dumps(data))
 
-    print("POST OK")
-    pprint.pprint(ret)
-
-    return ret
-
-# def dynamo_get(user_id):
+    # open chat conversations
+    data = {}
+    data = {
+        "users": user_id,
+    }
+    res = requests.post(conversations_open_url, headers=headers, data=json.dumps(data))
+    conversations_open_res = res.json()
     
-#     print("dynamo_get_part 1")
+    # send DM
+    res = ""
+    data = {}
+    data = {
+        "channel": conversations_open_res["channel"]["id"],
+        "text": message,
+    }
+    res = requests.post(post_message_url, headers=headers, data=json.dumps(data))
+    post_message_res = res.json()
 
-#     res = ""
+    print("print: post message response")
+    pprint.pprint(post_message_res)
 
-#     option = {
-#         "TableName": DDB_TABLE_NAME,
-#         "Key": {
-#             "user_id": {"S": user_id}
-#         }
-#     }
-#     res = dynamodb.get_item(**option)
-    
-#     pprint.pprint(res)
-#     pprint.pprint(res["Item"])
-
-#     return
-
-# def dynamo_update(user_id):
-
-#     res = ""    
-#     option = ""
-
-#     option = {
-#          "TableName": DDB_TABLE_NAME,
-#          "Key": {
-#             "user_id": {"S": user_id}
-#         },
-#         "UpdateExpression": "set attr1 = :attr1, attr2 = :attr2",
-#         'ExpressionAttributeValues': {
-#             ":attr1": {"S": "test"},
-#             ":attr2": {"S": "abcde"},
-#         }
-#     }
-    
-#     res = dynamodb.update_item(**option)
-#     pprint.pprint(res)
- 
-#     return
-
-
+    return post_message_res["ok"]
