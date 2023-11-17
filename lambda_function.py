@@ -149,9 +149,8 @@ def lambda_handler(event, context):
     
     # 5. send notification via slack and response
     # message via dm "to user"
-    post_message_to_user = "{from_user} から {receive_amount}everytip 受け取りました。現在 {total_amount}everytip 保有しています。 ".format(
+    post_message_to_user = "{from_user} さんから {receive_amount}everytip 受け取りました。現在 {total_amount}everytip 保有しています。 ".format(
         from_user = from_user_info["user_name"]["S"],
-        # to_user=to_user_info["user_name"]["S"],
         receive_amount = text_ret["amount"],
         total_amount = int(to_user_info["wallet"]["N"]) + int(text_ret["amount"])
     )
@@ -167,7 +166,7 @@ def lambda_handler(event, context):
         }
 
     # message via dm "from user"
-    post_message_from_user = "{to_user} へ {send_amount}everytipを送りました。残everytipは {total_amount}tip です".format(
+    post_message_from_user = "{to_user} さんへ {send_amount}everytipを送りました。残everytipは {total_amount}tip です".format(
         to_user = to_user_info["user_name"]["S"], 
         send_amount = text_ret["amount"],
         total_amount = int(from_user_info["wallet"]["N"]) - int(text_ret["amount"])
