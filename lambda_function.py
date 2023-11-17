@@ -149,7 +149,12 @@ def lambda_handler(event, context):
     
     # 5. send notification via slack and response
     # message via dm "to user"
-    post_message_to_user = "{from_user} は {to_user} に {amount}everytip を送りました。現在 {total_amount}everytip 保有しています。 ".format(from_user=from_user_info["user_name"]["S"], to_user=to_user_info["user_name"]["S"], amount=text_ret["amount"], total_amount=int(to_user_info["wallet"]["N"]) + int(text_ret["amount"]))
+    post_message_to_user = "{from_user} から {receive_amount}everytip 受け取りました。現在 {total_amount}everytip 保有しています。 ".format(
+        from_user = from_user_info["user_name"]["S"],
+        # to_user=to_user_info["user_name"]["S"],
+        receive_amount = text_ret["amount"],
+        total_amount = int(to_user_info["wallet"]["N"]) + int(text_ret["amount"])
+    )
     print("post message 'to user'")
     print(post_message_to_user)
     
@@ -162,7 +167,11 @@ def lambda_handler(event, context):
         }
 
     # message via dm "from user"
-    post_message_from_user = "{to_user} へeverytipを送りました。残everytipは {amount} tip です".format(to_user=to_user_info["user_name"]["S"], amount=int(from_user_info["wallet"]["N"]) - int(text_ret["amount"]))
+    post_message_from_user = "{to_user} へ {send_amount}everytipを送りました。残everytipは {total_amount}tip です".format(
+        to_user = to_user_info["user_name"]["S"], 
+        send_amount = text_ret["amount"],
+        total_amount = int(from_user_info["wallet"]["N"]) - int(text_ret["amount"])
+    )
     print("post message 'from user'")
     print(post_message_from_user)
     
