@@ -45,6 +45,13 @@ def lambda_handler(event, context):
         body = base64.b64decode(event["body"]).decode("utf-8")
         res = parse_qs(body)
     else:
+        print("print: error event")
+        pprint.pprint(event)
+        print("print: error event 2")
+        pprint.pprint(base64.b64decode(event["body"]).decode("utf-8"))
+        print("print: error event 3")
+        pprint.pprint(parse_qs(base64.b64decode(event["body"]).decode("utf-8")))
+        
         return {
             'statusCode': 500,
             'body': "internal service error"
