@@ -22,12 +22,7 @@ FPOS_USER_TABLE_NAME = "fpos_user_db"
 def lambda_handler(event, context):
     
     print("everytip is starting")
-    print("print: error event outside")
-    pprint.pprint(event)
-    print("print: error event 2 outside")
-    pprint.pprint(base64.b64decode(event["body"]).decode("utf-8"))
-    print("print: error event 3 outside")
-    pprint.pprint(parse_qs(base64.b64decode(event["body"]).decode("utf-8")))
+
     #################
     # list of procedure
     # 1. get and parse event
@@ -52,12 +47,7 @@ def lambda_handler(event, context):
         body = base64.b64decode(event["body"]).decode("utf-8")
         res = parse_qs(body)
     else:
-        print("print: error event")
-        pprint.pprint(event)
-        print("print: error event 2")
-        pprint.pprint(base64.b64decode(event["body"]).decode("utf-8"))
-        print("print: error event 3")
-        pprint.pprint(parse_qs(base64.b64decode(event["body"]).decode("utf-8")))
+        print("internal service error")
 
         return {
             'statusCode': 500,
@@ -82,12 +72,13 @@ def lambda_handler(event, context):
         "user_name": res["user_name"][0],
     }
    
-    # print("res_dict")
-    # pprint.pprint(res_dict)
+    print("res_dict")
+    pprint.pprint(res)
   
     # 1.1. validation format from text in event
     text_ret = text_validation(res["text"][0]) # format is [to_user*] [amount*] [message*]
     if not isinstance(text_ret, dict): # Error if text_ret does not have a list
+        print(text_ret)
         return {
             'statusCode': 400,
             'body': text_ret
@@ -205,16 +196,19 @@ def text_validation(text):
     ts = text.split()
     message = ""
     
+    pprint.pprint(ts)
     # print(ts[0])
     # print(ts[1])
     # print(ts[2])
 
     if len(ts) != 3:
         message = "invalid parameter"
+        print(message)
         return message
        
     if not ts[1].isnumeric():
         message = "invalid format of amount information"
+        print(message)
         return message
     
     ret = {
