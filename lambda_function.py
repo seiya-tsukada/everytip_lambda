@@ -47,7 +47,7 @@ def lambda_handler(event, context):
         body = base64.b64decode(event["body"]).decode("utf-8")
         res = parse_qs(body)
     else:
-        print("internal service error")
+        print("print: parse event is internal service error")
 
         return {
             'statusCode': 500,
@@ -84,8 +84,8 @@ def lambda_handler(event, context):
             'body': text_ret
         }
     
-    # print("text ret")
-    # pprint.pprint(text_ret)
+    print("print: text ret")
+    pprint.pprint(text_ret)
 
 
 
@@ -196,6 +196,7 @@ def text_validation(text):
     ts = text.split()
     message = ""
     
+    print("print: input text")
     pprint.pprint(ts)
     # print(ts[0])
     # print(ts[1])
@@ -203,12 +204,10 @@ def text_validation(text):
 
     if len(ts) != 3:
         message = "invalid parameter"
-        print(message)
         return message
        
     if not ts[1].isnumeric():
         message = "invalid format of amount information"
-        print(message)
         return message
     
     ret = {
