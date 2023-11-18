@@ -123,9 +123,8 @@ def lambda_handler(event, context):
     # 2.1. judgement whether available user or not
     user_val_ret = ""
     user_val_ret = user_validation(from_user_info, to_user_info)
-
-    print("user val ret")
-    pprint.pprint(user_val_ret)
+    # print("user val ret")
+    # pprint.pprint(user_val_ret)
     if user_val_ret != "SUCCESS": # Error if user_val_ret is False
         return {
             'statusCode': 400,
@@ -141,9 +140,8 @@ def lambda_handler(event, context):
     # 3. grant tip from user to to user
     grant_tip_ret = ""
     grant_tip_ret = grant_tip(from_user_info, to_user_info, text_ret["amount"])
-
-    print("grant tip ret")
-    pprint.pprint(grant_tip_ret)
+    # print("grant tip ret")
+    # pprint.pprint(grant_tip_ret)
     if grant_tip_ret != "SUCCESS": # Error if grant_tip_ret is False
         return {
             'statusCode': 400,
@@ -273,7 +271,7 @@ def user_validation(from_user, to_user):
 
 def grant_tip(from_user, to_user, amount):
 
-    print("grant tip ret function")
+    # print("grant tip ret function")
 
     if int(from_user["wallet"]["N"]) - int(amount) < 0:
         message = "{} is not enough tip".format(from_user["user_name"]["S"])
