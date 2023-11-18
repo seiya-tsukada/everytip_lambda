@@ -21,6 +21,8 @@ FPOS_USER_TABLE_NAME = "fpos_user_db"
 
 def lambda_handler(event, context):
     
+    print("everytip is starting")
+
     #################
     # list of procedure
     # 1. get and parse event
@@ -51,7 +53,7 @@ def lambda_handler(event, context):
         pprint.pprint(base64.b64decode(event["body"]).decode("utf-8"))
         print("print: error event 3")
         pprint.pprint(parse_qs(base64.b64decode(event["body"]).decode("utf-8")))
-        
+
         return {
             'statusCode': 500,
             'body': "internal service error"
