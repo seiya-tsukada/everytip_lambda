@@ -22,7 +22,12 @@ FPOS_USER_TABLE_NAME = "fpos_user_db"
 def lambda_handler(event, context):
     
     print("everytip is starting")
-
+    print("print: error event outside")
+    pprint.pprint(event)
+    print("print: error event 2 outside")
+    pprint.pprint(base64.b64decode(event["body"]).decode("utf-8"))
+    print("print: error event 3 outside")
+    pprint.pprint(parse_qs(base64.b64decode(event["body"]).decode("utf-8")))
     #################
     # list of procedure
     # 1. get and parse event
