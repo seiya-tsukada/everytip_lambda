@@ -53,9 +53,6 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': "internal service error"
         }
-       
-    # print("print: event")
-    # pprint.pprint(res)
    
     # parse event
     res_dict = {}
@@ -72,8 +69,11 @@ def lambda_handler(event, context):
         "user_name": res["user_name"][0],
     }
    
-    print("res_dict")
+    print("print: res and res_dict")
+    print("print: res")
     pprint.pprint(res)
+    print("print: res_dict")
+    pprint.pprint(res_dict)
   
     # 1.1. validation format from text in event
     text_ret = text_validation(res["text"][0]) # format is [to_user*] [amount*] [message*]
