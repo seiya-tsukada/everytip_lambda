@@ -215,14 +215,14 @@ def text_validation(text):
             if tmp_msg.find("\`"):
                 print("in ` func")
                 print(tmp_msg)
-                message = message + tmp_msg.replace("\`", "") + " "
+                message = message + tmp_msg.replace("`", "") + " "
             else:
                 message = message + tmp_msg + " "
         else:
             if tmp_msg.find("\`"):
                 print("in ` func")
                 print(tmp_msg)
-                message = message + tmp_msg.replace("\`", "")
+                message = message + tmp_msg.replace("`", "")
             else:
                 message = message + tmp_msg
 
