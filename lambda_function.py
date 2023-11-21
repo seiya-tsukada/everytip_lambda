@@ -207,9 +207,20 @@ def text_validation(text):
     
     to_user_name = ts.pop(0)
     amount = ts.pop(0)
-    for i in ts:
-        message = message + i + " "
-
+    # Free message generation
+    tmp_msg = ""
+    while ts:
+        tmp_msg = ts.pop(0)
+        if ts: # need to space?
+            if tmp_msg.find("`"):
+                message = message + tmp_msg.replace("`") + " "
+            else:
+                message = message + tmp_msg + " "
+        else:
+            if tmp_msg.find("`"):
+                message = message + tmp_msg.replace("`")
+            else:
+                message = message + tmp_msg
 
     if to_user_name.find("@") != 0:
         err_message = "invalid format of mentioned user information"
