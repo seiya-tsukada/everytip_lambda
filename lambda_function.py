@@ -202,6 +202,12 @@ def text_validation(text):
     # print(ts[1])
     # print(ts[2])
 
+    return {
+        'statusCode': 200,
+        'body': "temporary stop"
+    }
+
+
     if len(ts) != 3:
         message = "invalid parameter"
         return message
