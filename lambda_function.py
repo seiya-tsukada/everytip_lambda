@@ -50,7 +50,7 @@ def lambda_handler(event, context):
         print("print: parse event is internal service error")
 
         return {
-            'statusCode': 500,
+            'statusCode': 200,
             'body': "internal service error"
         }
    
@@ -78,15 +78,18 @@ def lambda_handler(event, context):
     # 1.1. validation format from text in event
     text_ret = text_validation(res["text"][0]) # format is [to_user*] [amount*] [message*]
     if not isinstance(text_ret, dict): # Error if text_ret does not have a list
-        print(text_ret)
         return {
-            'statusCode': 200, # temporary changed
+            'statusCode': 200,
             'body': text_ret
         }
     
     print("print: text ret")
     pprint.pprint(text_ret)
 
+    return {
+        'statusCode': 200,
+        'body': "break"
+    }
 
 
     #########################
@@ -101,7 +104,7 @@ def lambda_handler(event, context):
     pprint.pprint(from_user_info)
     if not isinstance(from_user_info, dict): # Error if text_ret does not have a list
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': "{} is not found".format(res["user_name"][0])
         }
 
@@ -112,7 +115,7 @@ def lambda_handler(event, context):
     pprint.pprint(to_user_info)
     if not isinstance(to_user_info, dict): # Error if text_ret does not have a list
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': "{} is not found".format(res["user_name"][0])
         }
 
@@ -123,7 +126,7 @@ def lambda_handler(event, context):
     # pprint.pprint(user_val_ret)
     if user_val_ret != "SUCCESS": # Error if user_val_ret is False
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': user_val_ret
         }
 
@@ -140,7 +143,7 @@ def lambda_handler(event, context):
     # pprint.pprint(grant_tip_ret)
     if grant_tip_ret != "SUCCESS": # Error if grant_tip_ret is False
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': "grant operation is failed"
         }
 
@@ -164,7 +167,7 @@ def lambda_handler(event, context):
     post_message_via_dm_res = post_message_via_dm(to_user_info["user_id"]["S"], post_message_to_user)
     if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': "post dm to user function is faile"
         }
 
@@ -181,7 +184,7 @@ def lambda_handler(event, context):
     post_message_via_dm_res = post_message_via_dm(from_user_info["user_id"]["S"], post_message_from_user)
     if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
         return {
-            'statusCode': 400,
+            'statusCode': 200,
             'body': "post dm from user function is faile"
         }
 
@@ -194,33 +197,33 @@ def text_validation(text):
 
     ret = ""
     ts = text.split()
+    to_user_name = ""
+    amount = ""
     message = ""
+    err_message = ""
     
     print("print: input text")
     pprint.pprint(ts)
-    # print(ts[0])
-    # print(ts[1])
-    # print(ts[2])
-
-    return {
-        'statusCode': 200,
-        'body': "temporary stop"
-    }
+    
+    to_user_name = ts.pop(0)
+    amount = ts.pop(0)
+    for i in ts:
+        message = message + i + " "
 
 
-    if len(ts) != 3:
-        message = "invalid parameter"
-        return message
+    if to_user_name.find("@") != 0:
+        err_message = "invalid format of mentioned user information"
+        return err_message
        
-    if not ts[1].isnumeric():
-        message = "invalid format of amount information"
-        return message
+    if not amount.isnumeric():
+        err_message = "invalid format of amount information"
+        return err_message
     
     ret = {
         # remove @ (mention prefix)
-        "to_user_name": ts[0].removeprefix("@"),
-        "amount": ts[1],
-        "message": ts[2]
+        "to_user_name": to_user_name.removeprefix("@"),
+        "amount": amount,
+        "message": message
     }
     
     return ret
