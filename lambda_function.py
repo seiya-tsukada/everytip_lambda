@@ -80,7 +80,7 @@ def lambda_handler(event, context):
     if not isinstance(text_ret, dict): # Error if text_ret does not have a list
         print(text_ret)
         return {
-            'statusCode': 400,
+            'statusCode': 200, # temporary changed
             'body': text_ret
         }
     
