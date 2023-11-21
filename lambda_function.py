@@ -213,12 +213,12 @@ def text_validation(text):
         tmp_msg = ts.pop(0)
         if ts: # need to space?
             if tmp_msg.find("`"):
-                message = message + tmp_msg.replace("`") + " "
+                message = message + tmp_msg.replace("`", "") + " "
             else:
                 message = message + tmp_msg + " "
         else:
             if tmp_msg.find("`"):
-                message = message + tmp_msg.replace("`")
+                message = message + tmp_msg.replace("`", "")
             else:
                 message = message + tmp_msg
 
