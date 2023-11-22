@@ -212,19 +212,9 @@ def text_validation(text):
     while ts:
         tmp_msg = ts.pop(0)
         if ts: # need to space?
-            if tmp_msg.find("\`"):
-                print("in ` func")
-                print(tmp_msg)
-                message = message + tmp_msg.replace("`", "") + " "
-            else:
-                message = message + tmp_msg + " "
+            message = message + tmp_msg.replace("`", "") + " "
         else:
-            if tmp_msg.find("\`"):
-                print("in ` func")
-                print(tmp_msg)
-                message = message + tmp_msg.replace("`", "")
-            else:
-                message = message + tmp_msg
+            message = message + tmp_msg.replace("`", "")
 
     if to_user_name.find("@") != 0:
         err_message = "invalid format of mentioned user information"
