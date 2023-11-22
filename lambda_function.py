@@ -54,6 +54,9 @@ def lambda_handler(event, context):
             'body': "internal service error"
         }
    
+    print("print: res")
+    pprint.pprint(res)
+
     # parse event
     res_dict = {}
     res_dict = {
@@ -69,9 +72,6 @@ def lambda_handler(event, context):
         "user_name": res["user_name"][0],
     }
    
-    print("print: res and res_dict")
-    print("print: res")
-    pprint.pprint(res)
     print("print: res_dict")
     pprint.pprint(res_dict)
   
@@ -82,14 +82,7 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': text_ret
         }
-    
-    print("print: text ret")
-    pprint.pprint(text_ret)
 
-    return {
-        'statusCode': 200,
-        'body': "break"
-    }
 
 
     #########################
@@ -164,7 +157,7 @@ def lambda_handler(event, context):
     print(post_message_to_user)
     
     post_message_via_dm_res = ""
-    post_message_via_dm_res = post_message_via_dm(to_user_info["user_id"]["S"], post_message_to_user)
+    post_message_via_dm_res = post_message_via_dm(to_user_info["user_id"]["S"], post_message_to_user, "long", text_ret["comment"])
     if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
         return {
             'statusCode': 200,
@@ -181,7 +174,7 @@ def lambda_handler(event, context):
     print(post_message_from_user)
     
     post_message_via_dm_res = ""
-    post_message_via_dm_res = post_message_via_dm(from_user_info["user_id"]["S"], post_message_from_user)
+    post_message_via_dm_res = post_message_via_dm(from_user_info["user_id"]["S"], post_message_from_user, "short")
     if not post_message_via_dm_res: # Error if post_message_via_dm_res is returned "False"
         return {
             'statusCode': 200,
@@ -199,12 +192,9 @@ def text_validation(text):
     ts = text.split()
     to_user_name = ""
     amount = ""
-    message = ""
+    comment = ""
     err_message = ""
-    
-    print("print: input text")
-    pprint.pprint(ts)
-    
+     
     to_user_name = ts.pop(0)
     amount = ts.pop(0)
     # Free message generation
@@ -212,9 +202,9 @@ def text_validation(text):
     while ts:
         tmp_msg = ts.pop(0)
         if ts: # need to space?
-            message = message + tmp_msg.replace("`", "") + " "
+            comment = comment + tmp_msg.replace("`", "") + " "
         else:
-            message = message + tmp_msg.replace("`", "")
+            comment = comment + tmp_msg.replace("`", "")
 
     if to_user_name.find("@") != 0:
         err_message = "invalid format of mentioned user information"
@@ -228,7 +218,7 @@ def text_validation(text):
         # remove @ (mention prefix)
         "to_user_name": to_user_name.removeprefix("@"),
         "amount": amount,
-        "message": message
+        "comment": comment
     }
     
     return ret
@@ -351,7 +341,7 @@ def insert_transaction_information(from_user, to_user, amount):
 
     return "SUCCESS"
 
-def post_message_via_dm(user_id, message):
+def post_message_via_dm(user_id, message, type, *comment):
 
     res = ""
     conversations_open_res = ""
@@ -372,10 +362,31 @@ def post_message_via_dm(user_id, message):
     # send DM
     res = ""
     data = {}
-    data = {
-        "channel": conversations_open_res["channel"]["id"],
-        "text": message,
-    }
+
+    # change message format "from user" and "to user"
+    if type == "short":
+        data = {
+            "channel": conversations_open_res["channel"]["id"],
+            "text": message,
+        }
+    elif type == "long" and comment:
+        data = {
+            "channel": conversations_open_res["channel"]["id"],
+            "attachments": json.dumps([
+                {
+                    "color": "good",
+                    "pretext": message,
+                    "fields": [
+                        {
+                            "title": "コメントが届いています",
+                            "value": comment,
+                            "short": True,
+                        },
+                    ],
+                }
+            ])
+        }
+
     res = requests.post(post_message_url, headers=headers, data=json.dumps(data))
     post_message_res = res.json()
 
