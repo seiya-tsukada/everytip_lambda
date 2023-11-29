@@ -347,7 +347,7 @@ def post_message_via_dm(user_id, message, type, *comment):
     print(user_id)
     print(message)
     print(type)
-    print(comment[0])
+    print(comment)
 
 
     res = ""
