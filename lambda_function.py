@@ -343,6 +343,13 @@ def insert_transaction_information(from_user, to_user, amount):
 
 def post_message_via_dm(user_id, message, type, *comment):
 
+    print("message function")
+    print(user_id)
+    print(message)
+    print(type)
+    print(comment)
+
+
     res = ""
     conversations_open_res = ""
     post_message_res = ""
