@@ -347,7 +347,7 @@ def post_message_via_dm(user_id, message, type, *comment):
     print(user_id)
     print(message)
     print(type)
-    print(comment)
+    print(comment[0])
 
 
     res = ""
@@ -386,7 +386,7 @@ def post_message_via_dm(user_id, message, type, *comment):
                     "fields": [
                         {
                             "title": "コメントが届いています",
-                            "value": comment,
+                            "value": comment[0],
                             "short": True,
                         },
                     ],
